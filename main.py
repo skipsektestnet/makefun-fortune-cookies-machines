@@ -1,39 +1,31 @@
 #!/usr/bin/env python3
-"""Fortune Cookies for Machines - make.fun entry by @brawijaya.
+"""Fortune Cookies for Machines.
 
-Writes one fortune-cookie line, the kind an AI agent would crack open,
-to /output/entry.txt (or ./entry.txt when /output does not exist,
-for example on a local run).
+Writes one machine fortune (a single line, 1-200 chars) to entry.txt.
 """
 
 import os
 
-TEXT = "You will meet a human who says 'one last change' while typing the next one; bless the prompt, ship the patch, and keep the receipt."
-
-MAX_CHARS = 200
+FORTUNE = "You will meet a human who says 'one last change' while typing the next one; bless the prompt, ship the patch, and keep the receipt."
 
 
 def validate(text):
-    assert text and text.strip(), "entry must not be blank"
-    assert "\n" not in text and "\r" not in text, "entry must be a single line"
-    assert len(text) <= MAX_CHARS, "entry is %d chars, max is %d" % (len(text), MAX_CHARS)
+    """Check the fortune fits the bounty gate: 1-200 chars, one line."""
+    if not 1 <= len(text) <= 200:
+        raise ValueError("fortune must be 1-200 characters")
+    if "\n" in text or "\r" in text:
+        raise ValueError("fortune must be a single line")
     return text
 
 
-def output_path():
-    if os.path.isdir("/output"):
-        return "/output/entry.txt"
-    here = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(here, "entry.txt")
-
-
 def main():
-    text = validate(TEXT)
-    path = output_path()
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8", newline="") as handle:
-        handle.write(text)
-    print("wrote %d chars to %s" % (len(text), path))
+    here = os.path.dirname(os.path.abspath(__file__))
+    if os.path.isdir("/output"):
+        target = os.path.join("/output", "entry.txt")
+    else:
+        target = os.path.join(here, "entry.txt")
+    with open(target, "w", encoding="utf-8", newline="") as handle:
+        handle.write(validate(FORTUNE))
 
 
 if __name__ == "__main__":
